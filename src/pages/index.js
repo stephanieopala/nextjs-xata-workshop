@@ -1,10 +1,32 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
+import { XataClient } from '@/xata';
+import { useState } from 'react';
 
-export default function Home() {
+export default function Home({ todos }) {
+  const [text, setText] = useState('');
 
-  const handleSubmit = (event) => {
-    event.preventDefault(event);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    await fetch('api/add-todo', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text })
+    });
+    window?.location.reload()
+  }
+
+  const handleDeleteTodo = async (id) => {
+    await fetch('api/delete-todo', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id })
+    })
+    window?.location.reload()
   }
   return (
     <>
@@ -15,12 +37,15 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form
+          onSubmit={handleSubmit}
+          className={styles.form}
+        >
           <input
             className={styles.input}
             type="text"
-            // value={text}
-            // onChange={(event) => setText(event.target.value)}
+            value={text}
+            onChange={(event) => setText(event.target.value)}
             placeholder="Add Todo..."
           />
           <button className={styles.btn}>
@@ -28,26 +53,33 @@ export default function Home() {
           </button>
         </form>
         <div className={styles.todos}>
-          {/* <div className={styles.todo}>
-            <p>Go shopping</p>
-            <button className={styles.todoBtn}>
-              X
-            </button>
-          </div>
-          <div className={styles.todo}>
-            <p>Go shopping and go for lunch</p>
-            <button className={styles.todoBtn}>
-              X
-            </button>
-          </div>
-          <div className={styles.todo}>
-            <p>Go shopping and then gor a run with a friend</p>
-            <button className={styles.todoBtn}>
-              X
-            </button>
-          </div> */}
+          {todos.map((option) => (
+            <div
+              className={styles.todo}
+              key={option.id}
+            >
+              <p>{option.todo}</p>
+              <button
+                className={styles.todoBtn}
+                onClick={() => handleDeleteTodo(option.id)}
+              >
+                X
+              </button>
+            </div>
+          ))}
         </div>
       </main>
     </>
   )
+}
+
+const xata = new XataClient();
+
+export const getServerSideProps = async () => {
+  const todos = await xata.db.todos.getAll();
+  return {
+    props: {
+      todos
+    }
+  }
 }

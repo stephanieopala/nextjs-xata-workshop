@@ -1,0 +1,7 @@
+{
+  "databaseURL": "https://Stephanie-Opala-s-workspace-tp7dfp.us-east-1.xata.sh/db/ecommerce2",
+  "codegen": {
+    "output": "src/xata.js",
+    "moduleType": "esm"
+  }
+}
