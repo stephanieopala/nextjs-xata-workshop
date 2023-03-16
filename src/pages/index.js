@@ -41,12 +41,15 @@ export default function Home({ todos }) {
           onSubmit={handleSubmit}
           className={styles.form}
         >
+          <label for="addTodo">
+            Add todo
+          </label>
           <input
+            id="addTodo"
             className={styles.input}
             type="text"
             value={text}
             onChange={(event) => setText(event.target.value)}
-            placeholder="Add Todo..."
           />
           <button className={styles.btn}>
             Add
